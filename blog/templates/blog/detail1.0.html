@@ -1,0 +1,46 @@
+{% extends 'blog/blog.html' %}
+
+
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
+      <div class="panel panel-default">
+
+        {% block content_blog %}
+
+          <div class="panel-heading">
+            <h3 class="panel-title">{{ blog.title }}</h3>
+          </div>
+          <div class="panel-body">
+            <!-- 博客列表 -->
+            <h4>
+              作者：{{ blog.author }}
+            </h4>
+            <p>阅读数：{{ blog.get_read_num }}</p>
+            <p>分类：<a href="{% url 'blog:blog_with_tag' blog.blog_type.id %}">{{ blog.blog_type }}</a></p>
+            <p>
+              {{ blog.content }}
+            </p>
+          </div>
+
+        {% endblock %}
+
+      </div>
+
+      {% block content_page %}
+
+      <div>
+        {% if previous_page %}
+          <p>上一篇；<a href="{% url 'blog:detail' previous_page.id %}">{{ previous_page.title }}</a></p>
+        {% else %}
+        {% endif %}
+        {% if next_page %}
+          <p>下一篇：<a href="{% url 'blog:detail' next_page.id %}">{{ next_page.title }}</a></p>
+        {% else %}
+        {% endif %}
+      </div>
+
+      {% endblock %}
+    </div>
+  </div>
+</div>

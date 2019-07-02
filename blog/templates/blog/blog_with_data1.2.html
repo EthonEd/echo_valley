@@ -1,0 +1,23 @@
+{% extends 'blog/base.html' %}
+
+
+{% block content_title %}
+  {{ date|date:'Y年m月' }} 共{{ count }}篇
+{% endblock %}
+
+
+{% block content_body %}
+  <ul>
+    {% for blog in blogs %}
+      <li>
+        <a href="{% url 'blog:detail' blog.id %}">{{ blog.title }}</a>
+        <p>{{ blog.content|truncatechars:120 }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+
+
+
+

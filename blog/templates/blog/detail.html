@@ -1,0 +1,124 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% load markdown_deux_tags %}
+
+
+{% block content_body %}
+
+  <h3>{{ blog.title }}
+    <small><a href="{% url 'blog:edit_blog' blog.id %}">点击修改</a></small></h3>
+  <p>
+    <span class="glyphicon glyphicon-tag" aria-hidden="true"><a href="#">{{ blog.blog_type }}</a></span>
+    <span class="glyphicon glyphicon-user" aria-hidden="true"><a href="#">{{ blog.author }}</a> </span>
+    <span class="glyphicon glyphicon-calendar"
+          aria-hidden="true">{{ blog.create_time|date:'Y-m-d' }}</span>
+    <span class="glyphicon glyphicon-eye-open" aria-hidden="true">{{ blog.get_read_num }}</span>
+  </p>
+  <p>{{ blog.content|safe|markdown:"STYLE" }}</p>
+{#  <p>{{ blog.content }}</p>#}
+
+{% endblock %}
+
+{% block content_page %}
+
+  <div>
+    {% if previous_page %}
+      <p>上一篇；<a href="{% url 'blog:detail' previous_page.id %}">{{ previous_page.title }}</a></p>
+    {% else %}
+    {% endif %}
+    {% if next_page %}
+      <p>下一篇：<a href="{% url 'blog:detail' next_page.id %}">{{ next_page.title }}</a></p>
+    {% else %}
+    {% endif %}
+  </div>
+
+  {#  评论区域#}
+  <div style="margin-top: 2em; border: 1px dashed; padding: 2em">
+    {% if user.is_authenticated %}
+      已登录
+      <form id="comment_form" action="{% url 'comment:update_comment' %}" method="POST" style="overflow: hidden">
+        {% csrf_token %}
+        {% for field in comment_form %}
+          {{ field }}
+        {% endfor %}
+        <p class="text-danger pull-left" id="comment_error">{{ field.errors }}</p>
+        <input class="btn btn-primary pull-right" type="submit" value="提交评论">
+      </form>
+    {% else %}
+      提交评论
+      <a href="{% url 'blog:login' %}?from={{ request.get_full_path }}">登录</a>or
+      <a href="{% url 'blog:register' %}?from={{ request.get_full_path }}">注册</a>
+    {% endif %}
+  </div>
+  <div style="margin-top: 2em; border: 1px dashed; padding: 2em">
+    评论列表
+    {% for comment in comments %}
+      <div id="comment_list">
+      {{ comment.user }}
+        ({{ comment.comment_time|date:'Y-m-d H:i:s' }}):
+        {{ comment.text|safe }}
+      </div>
+    {% empty %}
+      暂无评论
+    {% endfor %}
+
+  </div>
+
+
+{% endblock %}
+
+{% block add_thing_ahead %}
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div align="center">
+        <img src="{% static 'img/icon.jpg' %}" alt="..." class="img-circle" width="40%">
+      </div>
+      <div align="center" style="margin-top: 1.5em">
+        <P>
+          <span class="glyphicon glyphicon-user" aria-hidden="true"> | {{ blog.author }}</span>
+        </P>
+        <p>这场残暴的欢愉,终将以残暴终结</p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+
+{% block script_add %}
+  <script>
+      $('#comment_form').submit(function () {
+
+          $('#comment_error').text('');
+
+          if (CKEDITOR.instances['id_text'].document.getBody().getText().trim() == '') {
+              $('#comment_error').text('评论内容不能为空');
+              return false;
+          }
+
+          CKEDITOR.instances['id_text'].updateElement();
+
+          $.ajax({
+              url: '{% url 'comment:update_comment' %}',
+              type: 'POST',
+              data: $(this).serialize(),
+              cache: false,
+              success: function (data) {
+                  {#console.log(data);#}
+                  if (data['status'] == 'SUCCESS') {
+                      var comment_html = '<div>' + data['username'] + '(' + data['comment_time'] + '): ' + data['text'] + '</div>';
+                      $('#comment_list').prepend(comment_html);
+                      CKEDITOR.instances['id_text'].setData('')
+                  } else {
+                      $('#comment_error').text(data['message']);
+                  }
+              },
+              error: function (xhr) {
+                  console.log(xhr)
+              }
+          });
+          return false
+      })
+  </script>
+
+{% endblock %}

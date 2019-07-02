@@ -1,0 +1,74 @@
+{% extends 'blog/home.html' %}
+
+{% block content %}
+
+  <div style="margin-top: 2em; padding:4em">
+    {% if user.is_authenticated %}
+      <p>(上次次修改时间{{ blog.last_update_time|date:'Y-m-d H:i:s' }})</p>
+      <form action="{% url 'blog:edit_blog' blog.id%}" method="POST" style="overflow: hidden">
+        <div>{{ form.media }}</div>
+        {#        {{ blog_form.as_p }}#}
+        {% csrf_token %}
+        {#        原始显示方式#}
+        {% for field in form %}
+          {% if field.label == '标签' %}
+            <div style="border-bottom: 1px solid #cccc; margin-bottom: 2em; padding-bottom: 0.5em">
+              <h4>{{ field.label_tag }}</h4>
+              <h5>选择一个标签{{ field }}或
+              <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target=".bs-example-modal-sm">添加新标签
+              </button></h5>
+            </div>
+            {% elif field.label == '标题'%}
+            <div style="border-bottom: 1px solid #cccc; margin-bottom: 2em; padding-bottom: 0.5em">
+{#              <label for="recipient-name" class="control-label">{{ field.label_tag }}</label>#}
+              <h4>{{ field.label_tag }}</h4>
+                <div style="width: 60%">{{ field }}</div>
+            </div>
+          {% else %}
+            <div style="border-bottom: 1px solid #cccc; margin-bottom: 2em; padding-bottom: 0.5em">
+              <h4>{{ field.label_tag }}</h4>{{ field }}
+            </div>
+          {% endif %}
+        {% endfor %}
+        <p class="text-danger pull-right" id="comment_error">{{ field.errors }}</p>
+        <input class="btn btn-primary pull-left" type="submit" value="提交">
+      </form>
+    {% else %}
+      <a href="{% url 'blog:login' %}?from={{ request.get_full_path }}">登录</a>or
+      <a href="{% url 'blog:register' %}?from={{ request.get_full_path }}">注册</a>
+      后方可写博客
+    {% endif %}
+  </div>
+
+
+
+  <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                  aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">添加标签</h4>
+        </div>
+        <div class="modal-body">
+
+          <form action="{% url 'blog:new_tag' %}" method="post" id="tag_form">
+            <div class="form-group">
+              {% csrf_token %}
+              {% for field in type_form %}
+                <label for="recipient-name" class="control-label">{{ field.label_tag }}</label>
+                {{ field }}
+              {% endfor %}
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+              <input class="btn btn-primary" type="submit" value="保存">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

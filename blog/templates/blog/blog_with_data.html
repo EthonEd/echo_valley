@@ -1,0 +1,10 @@
+{% extends 'blog/blog.html' %}
+
+
+{% block blog_title %}
+{{ date|date:'Y年m月' }} 共{{ count }}篇<a href="{% url 'blog:blog' %}" style="float: right; color: #337ab7" >查看全部博客</a>
+{% endblock %}
+
+
+
+

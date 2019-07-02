@@ -1,0 +1,107 @@
+{% extends 'blog/base.html' %}
+
+
+{% block content_title %}
+  {% block blog_title %}
+    博客一共{{ count }}篇
+  {% endblock %}
+{% endblock %}
+
+{% block content_body %}
+  <ul>
+    {% for blog in blogs %}
+      <li>
+        <a href="{% url 'blog:detail' blog.id %}" id="title">{{ blog.title }}</a>
+        <p>
+          <span class="glyphicon glyphicon-tag" aria-hidden="true"><a href="#">{{ blog.blog_type }}</a></span>
+          <span class="glyphicon glyphicon-user" aria-hidden="true"><a href="#">{{ blog.author }}</a> </span>
+          <span class="glyphicon glyphicon-calendar"
+                aria-hidden="true">{{ blog.create_time|date:'Y-m-d' }}</span>
+          <span class="glyphicon glyphicon-eye-open" aria-hidden="true">{{ blog.get_read_num }}</span>
+        </p>
+        <p>{{ blog.content|truncatechars:120|safe }}</p>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+
+{% block add_thing_after %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">阅读榜</h3>
+    </div>
+    <div class="panel-body">
+    <p>今日阅读榜</p>
+    <ul>
+      {% for today_data in read_hot_today_datas|slice:'0:3' %}
+        <li>
+        <a href="{% url 'blog:detail' today_data.content_type.pk %}" id="title">
+          {{ today_data.content_object.title }}({{ today_data.read_num }})
+        </a>
+        </li>
+      {% empty %}
+        暂无阅读
+      {% endfor %}
+    </ul>
+    <p>一周阅读榜</p>
+    <ul>
+      {% for week_blog in read_hot_week_blogs %}
+        <li>
+        <a href="{% url 'blog:detail' week_blog.id %}" id="title">
+          {{ week_blog.title }}({{ week_blog.read_num_sum }})
+        </a>
+        </li>
+      {% empty %}
+        暂无阅读
+      {% endfor %}
+    </ul>
+    </div>
+  </div>
+
+
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">一周博客阅读数</h3>
+    </div>
+    <div class="panel-body">
+      <div id="container" style="max-width: 18em; min-width:12em;height:12em"></div>
+      <script>
+          // 图表配置
+          var options = {
+              chart: {
+                  type: 'line'                          //指定图表的类型，默认是折线图（line）
+              },
+              title: {
+                  text: null                 // 标题
+              },
+              xAxis: {
+                  categories: {{ dates|safe }}   // x 轴分类
+              },
+              yAxis: {
+                  title: {text: null},
+                  labels: {enabled: false},
+                  gridLineDashStyle: 'Dash',
+              },
+              series: [{                              // 数据列
+                  name: '阅读量',                        // 数据列名
+                  data: {{ read_nums }}                    // 数据
+              },],
+              legend: enable = false,
+              credits: enabled = false,
+              plotOptions: {
+                  line: {
+                      dataLabels: {
+                          enabled: true
+                      }
+                  }
+              }
+          };
+          // 图表初始化函数
+          var chart = Highcharts.chart('container', options);
+      </script>
+    </div>
+  </div>
+{% endblock %}
+

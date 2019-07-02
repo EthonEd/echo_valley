@@ -1,0 +1,31 @@
+{% extends 'blog/home.html' %}
+
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-4 col-lg-offset-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">登录
+              <a href="{% url 'blog:register' %}" style="float: right; color: #337ab7">注册</a>
+            </h3>
+          </div>
+          <div class="panel-body">
+            <form action="" method="POST">
+              {% csrf_token %}
+              {% for field in login_form %}
+                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                <p class="text-danger">{{ field.errors }}</p>
+              {% endfor %}
+            <span class="pull-left text-danger">{{ login_form.non_field_erroes }}</span>
+              <input type="submit" value="登录" class="btn btn-primary" style="float: right; margin-top: 0.5em
+">
+            </form>
+          </div>
+        </div>
+      </div>
+
+
+{% endblock %}

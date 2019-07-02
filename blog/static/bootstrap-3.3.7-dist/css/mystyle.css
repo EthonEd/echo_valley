@@ -1,0 +1,30 @@
+ul {
+    list-style: none;
+}
+
+div#blog-cont li a#title{
+    font-size: 1.6em;
+}
+
+div#blog-cont p span a{
+    color: #0f0f0f;
+}
+
+div#blog-cont li:not(:last-child){
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1em;
+    margin-bottom: 1.5em;
+}
+
+div #blog-cont p span{
+    padding-right: 1em;
+}
+
+div #blog-cont p {
+    margin-bottom: 0;
+    margin-top: 0.3em;
+}
+
+div.django-ckeditor-widget {
+    width: 100%;
+}
